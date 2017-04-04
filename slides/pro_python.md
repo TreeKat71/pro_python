@@ -20,6 +20,7 @@ Ian Chen @ 資策會
 
 * Get the slides/code
 * Install Vagrant @ https://www.vagrantup.com
+* Sample Data @ goo.gl/BxgeJs
 
 ---
 
@@ -306,6 +307,28 @@ Have a dedicated queue server to manage our tasks
 ```
 pip install rq
 ```
+http://python-rq.org
+
+* Tasks are stored in Redis Queue
+* Workers can be started on different machines, as long as they can talk to the Redis Server
+
+---
+
+Celery is another great library
+
+http://www.celeryproject.org
+
+---
+
+## Python and Big Data Tools
+
+---
+
+* MRJob
+* PySpark
+* Dask
+* Blaze
+
 
 
 
