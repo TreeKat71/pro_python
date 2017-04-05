@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>reveal-md</title>
+        <link rel="stylesheet" href="./css/reveal.css">
+        <link rel="stylesheet" href="./css/theme/black.css" id="theme">
+        <link rel="stylesheet" href="./css/highlight/zenburn.css">
+        <link rel="stylesheet" href="./css/print/paper.css" type="text/css" media="print">
+
+    </head>
+    <body>
+
+        <div class="reveal">
+            <div class="slides"><section  data-markdown><script type="text/template"># Pro Python
+
+Ian Chen @ 資策會
+
+2017-04-05
+</script></section><section  data-markdown><script type="text/template">
+# Agenda
+</script></section><section  data-markdown><script type="text/template">
+* Production Python
+* Concurrency and Python
+* Python and Big Data Tools
+</script></section><section  data-markdown><script type="text/template">
+## Environments
+
+* Get the slides/code
+* Install Vagrant @ https://www.vagrantup.com
+* Sample Data @ goo.gl/BxgeJs
+</script></section><section  data-markdown><script type="text/template">
+* Open your favorite shell emulator(i.e. Cygwin)
+* Change to the directory of the downloaded slides/code
+
+```
+vagrant up
+```
+</script></section><section  data-markdown><script type="text/template">
+```
+vagrant ssh
+```
+</script></section><section  data-markdown><script type="text/template">
+## What is included
+
+* Ubuntu 14.04 64bit
+* CDH(Hadoop, Spark)
+
+See all details in `bootstrap.sh`
+</script></section><section  data-markdown><script type="text/template">
+# Production Python
+</script></section><section  data-markdown><script type="text/template">
+Learned how to write Python with Jupyter Notebook
+![happy](./static/happy.jpg)
+</script></section><section  data-markdown><script type="text/template">
+In a production environment,
+
+* Linux
+* No GUI
+* Version Controlled
+* Multiple versions of Python
+* Multiple versions of Python libraries
+</script></section><section  data-markdown><script type="text/template">
+Installing Python in production
+</script></section><section  data-markdown><script type="text/template">
+```bash
+apt-get install python
+```
+
+```bash
+yum install python
+```
+</script></section><section  data-markdown><script type="text/template">
+# No No No
+</script></section><section  data-markdown><script type="text/template">
+What's wrong with installing Python with OS package managers?
+
+* Python versions shipped with OS are old
+* Need administrator privilege
+* Hard to manage multiple versions of Python
+</script></section><section  data-markdown><script type="text/template">
+pyenv
+
+https://github.com/pyenv/pyenv-installer
+</script></section><section  data-markdown><script type="text/template">
+Make sure you have dependencies for building Python from source
+</script></section><section  data-markdown><script type="text/template">
+```
+# List available Python versions to install
+pyenv install -l
+
+# Install Python
+pyenv install 3.6.1
+
+# Set python version for system default
+pyenv global 3.6.1
+
+# Set python version for current directory
+pyenv local 3.6.1
+```
+</script></section><section  data-markdown><script type="text/template">
+Advantages of using pyenv
+
+* Manage and install multiple versions of Python
+* No administrator privilege needed
+* Manage python versions at different contexts
+</script></section><section  data-markdown><script type="text/template">
+Let's talk about packages
+</script></section><section  data-markdown><script type="text/template">
+```
+pip install requests
+```
+
+* Installs packages from Pypi, git repository,etc..
+
+Where are the packages installed?
+</script></section><section  data-markdown><script type="text/template">
+What is the problem?
+
+* What if we need different package versions for different projects?
+* pip installs packages in global context by default
+</script></section><section  data-markdown><script type="text/template">
+## Virtual Environment
+
+```
+virtualenv
+```
+</script></section><section  data-markdown><script type="text/template">
+* Creates an isolated directory for python packages
+* Was a addon package, become part of standard python packages in version 2.x
+</script></section><section  data-markdown><script type="text/template">
+```
+python -m venv venv
+source venv/bin/activate
+```
+</script></section><section  data-markdown><script type="text/template">
+```
+pip install requests
+pip freeze
+```
+</script></section><section  data-markdown><script type="text/template">
+Manage project packages
+
+```
+pip freeze > requirements.txt
+pip install -r requirements.txt
+```
+</script></section><section  data-markdown><script type="text/template">
+## Logging
+</script></section><section  data-markdown><script type="text/template">
+## Concurrency and Python
+</script></section><section  data-markdown><script type="text/template">
+* Modern CPUs advances towards more cores rather than higher clock speed
+* In order to make our program run faster, we need to make our program utilize resources more *efficiently*
+* Make our program concurrent
+</script></section><section  data-markdown><script type="text/template">
+Concurrency vs Parallelism
+
+---
+Concurrency: Do multiple things in the same context
+Parallelism: Separate one thing into multiple pieces and do them at the same time
+</script></section><section  data-markdown><script type="text/template">
+There are two kinds of programs
+* CPU bound
+  * Matrix calculation, html parsing
+* IO bound
+  * Disk IO, network IO, database IO
+</script></section><section  data-markdown><script type="text/template">
+CPU bound
+
+* Use more cores
+* Multi threading
+* Multi processing
+</script></section><section  data-markdown><script type="text/template">
+IO bound
+
+* Use core(s) more efficiently 
+* Cooperative multi-tasking
+* If you are not using the CPU, let someone else use it
+</script></section><section  data-markdown><script type="text/template">
+Python is single threaded
+
+* Global Interpreter Lock (GIL)
+</script></section><section  data-markdown><script type="text/template">
+Multi Threading in Python
+
+* Due to the GIL, we can't have real multi threading.
+* Running multi threaded programs on multi-core machines actually may make your program slower
+</script></section><section  data-markdown><script type="text/template">
+Beat the GIL
+
+* multi processing
+* forks the python interpreter into separate process
+* memory is pickled to different processes
+</script></section><section  data-markdown><script type="text/template">
+Cooperative multi-tasking
+
+* Greenlets
+* AsyncIO
+</script></section><section  data-markdown><script type="text/template">
+Quick and Dirty cooperative multi-tasking
+
+```
+pip install gevent
+```
+
+https://github.com/gevent/gevent
+</script></section><section  data-markdown><script type="text/template">
+Gevent monkey patch
+
+```python
+from gevent import monkey
+monkey.patch_all()
+```
+
+implicitly patches all sockets to async sockets
+</script></section><section  data-markdown><script type="text/template">
+Now we run the program in the event loop
+
+```python
+jobs = [gevent.spawn(get_page, _url) for _url in urls]
+
+gevent.wait(jobs)
+```
+</script></section><section  data-markdown><script type="text/template">
+## Scaling beyond a single machine
+</script></section><section  data-markdown><script type="text/template">
+welcome to the land of distributed systems
+</script></section><section  data-markdown><script type="text/template">
+Have a dedicated queue server to manage our tasks
+* Redis(via Pub/Sub)
+* RabbitMQ
+* Kafka
+</script></section><section  data-markdown><script type="text/template">
+```
+pip install rq
+```
+http://python-rq.org
+
+* Tasks are stored in Redis Queue
+* Workers can be started on different machines, as long as they can talk to the Redis Server
+</script></section><section  data-markdown><script type="text/template">
+Celery is another great library
+
+http://www.celeryproject.org
+</script></section><section  data-markdown><script type="text/template">
+## Python and Big Data Tools
+</script></section><section  data-markdown><script type="text/template">
+* MRJob
+* PySpark
+* Dask
+* Blaze
+
+
+
+
+
+
+</script></section></div>
+        </div>
+
+        <script src="./lib/js/head.min.js"></script>
+        <script src="./js/reveal.js"></script>
+
+        <script>
+            function extend() {
+              var target = {};
+              for (var i = 0; i < arguments.length; i++) {
+                var source = arguments[i];
+                for (var key in source) {
+                  if (source.hasOwnProperty(key)) {
+                    target[key] = source[key];
+                  }
+                }
+              }
+              return target;
+            }
+
+            // Optional libraries used to extend on reveal.js
+            var deps = [
+              { src: './lib/js/classList.js', condition: function() { return !document.body.classList; } },
+              { src: './plugin/markdown/marked.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+              { src: './plugin/markdown/markdown.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+              { src: './plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+              { src: './plugin/zoom-js/zoom.js', async: true },
+              { src: './plugin/notes/notes.js', async: true },
+              { src: './plugin/math/math.js', async: true }
+            ];
+
+            // default options to init reveal.js
+            var defaultOptions = {
+              controls: true,
+              progress: true,
+              history: true,
+              center: true,
+              transition: 'default', // none/fade/slide/convex/concave/zoom
+              dependencies: deps
+            };
+
+            // options from URL query string
+            var queryOptions = Reveal.getQueryHash() || {};
+
+            var options = {};
+            options = extend(defaultOptions, options, queryOptions);
+            Reveal.initialize(options);
+        </script>
+        
+    </body>
+</html>
